@@ -1,0 +1,1 @@
+# animalcrossing-api
