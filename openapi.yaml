@@ -1,0 +1,238 @@
+swagger: "2.0"
+host: localhost:8322
+info:
+  version: 1.0.0
+  title: acnh
+basePath: /api/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+
+definitions:
+  Resource:
+    type: object
+    description: The basic object
+    discriminator: resource_type
+    properties:
+      resource_type:
+        description: type of the resource
+        type: string
+      id:
+        description: id
+        type: integer
+      name:
+        $ref: "#/definitions/Name"
+    required:
+      - id
+      - name
+      - resource_type
+
+  ListResult:
+    type: object
+    description: The list object
+    properties:
+      result_count:
+        type: integer
+        readOnly: true
+      page_cursor:
+        type: string
+        description: result count
+
+  Name:
+    type: object
+    properties:
+      name_en:
+        type: string
+        description: english
+      name_cn:
+        type: string
+        description: chinese
+
+  Weather:
+    type: string
+    enum:
+      - Any
+      - Rain
+      - Snow
+
+  Rarity:
+    type: string
+    enum:
+      - Common
+      - Uncommon
+      - Rare
+      - Ultra-rare
+
+  Months:
+    type: object
+    properties:
+      northern:
+        type: array
+        items:
+          type: integer
+      southern:
+        type: array
+        items:
+          type: integer
+
+  Availability:
+    type: object
+    properties:
+      months:
+        $ref: "#/definitions/Months"
+      hours:
+        description: availability by hour range
+        type: array
+        items:
+          type: array
+          minLength: 2
+          maxLength: 2
+          items:
+            type: string
+      location:
+        type: string
+      weather:
+        type: array
+        items:
+          $ref: "#/definitions/Weather"
+      rarity:
+        $ref: "#/definitions/Rarity"
+
+  Fish:
+    type: object
+    allOf:
+      - $ref: "#/definitions/Resource"
+      - type: object
+        properties:
+          availability:
+            $ref: "#/definitions/Availability"
+          price:
+            type: number
+            format: integer
+          shadow:
+            type: string
+
+  FishListResult:
+    type: object
+    allOf:
+      - $ref: "#/definitions/ListResult"
+      - type: object
+        properties:
+          results:
+            type: array
+            items:
+              $ref: "#/definitions/Fish"
+
+  Bug:
+    type: object
+    allOf:
+      - $ref: "#/definitions/Resource"
+      - type: object
+        properties:
+          availability:
+            $ref: "#/definitions/Availability"
+          price:
+            type: number
+            format: integer
+          shadow:
+            type: string
+
+  BugListResult:
+    type: object
+    allOf:
+      - $ref: "#/definitions/ListResult"
+      - type: object
+        properties:
+          results:
+            type: array
+            items:
+              $ref: "#/definitions/Bug"
+
+parameters:
+  SortBy:
+    description: Fields by which the records are sorted
+    type: string
+    in: query
+    name: sort_by
+    required: false
+  Cursor:
+    type: string
+    in: query
+    name: cursor
+    required: false
+  PageSize:
+    description: Maximal number of record return in one page, server may return less.
+    in: query
+    name: page_size
+    type: integer
+    minimum: 0
+    maximum: 1000
+    default: 20
+    required: false
+
+paths:
+  /catalog/fishes:
+    get:
+      tags:
+        - fish
+      operationId: listFishes
+      parameters:
+        - $ref: "#/parameters/Cursor"
+        - $ref: "#/parameters/PageSize"
+        - $ref: "#/parameters/SortBy"
+      responses:
+        200:
+          description: returns a list of fishes
+          schema:
+            $ref: "#/definitions/FishListResult"
+  /catalog/fishes/{id}:
+    get:
+      tags:
+        - fish
+      operationId: getFish
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Numeric ID of the fish to get.
+      responses:
+        200:
+          description: return a fish
+          schema:
+            $ref: "#/definitions/Fish"
+        404:
+          description: not found
+  /catalog/bugs:
+    get:
+      tags:
+        - bug
+      operationId: listBugs
+      parameters:
+        - $ref: "#/parameters/Cursor"
+        - $ref: "#/parameters/PageSize"
+        - $ref: "#/parameters/SortBy"
+      responses:
+        200:
+          description: return a list of bugs
+          schema:
+            $ref: "#/definitions/BugListResult"
+  /catalog/bugs/{id}:
+    get:
+      tags:
+        - bug
+      operationId: getBug
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Numeric ID of the bug to get.
+      responses:
+        200:
+          description: return a bug
+          schema:
+            $ref: "#/definitions/Bug"
+        404:
+          description: not found
