@@ -10,25 +10,28 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// Name name
+// Image image
 //
-// swagger:model Name
-type Name struct {
+// swagger:model Image
+type Image struct {
 
-	// chinese
-	NameCn string `json:"name_cn,omitempty" bson:"name_cn"`
+	// image filename
+	ImageFilename string `json:"image_filename,omitempty" bson:"image_filename"`
 
-	// english
-	NameEn string `json:"name_en,omitempty" bson:"name_en"`
+	// image type
+	ImageType string `json:"image_type,omitempty" bson:"image_type"`
+
+	// image url
+	ImageURL string `json:"image_url,omitempty" bson:"image_url"`
 }
 
-// Validate validates this name
-func (m *Name) Validate(formats strfmt.Registry) error {
+// Validate validates this image
+func (m *Image) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *Name) MarshalBinary() ([]byte, error) {
+func (m *Image) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -36,8 +39,8 @@ func (m *Name) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Name) UnmarshalBinary(b []byte) error {
-	var res Name
+func (m *Image) UnmarshalBinary(b []byte) error {
+	var res Image
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

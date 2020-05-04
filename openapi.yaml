@@ -10,23 +10,19 @@ produces:
   - application/json
 
 definitions:
-  Resource:
+  Image:
     type: object
-    description: The basic object
-    discriminator: resource_type
+    description: image
     properties:
-      resource_type:
-        description: type of the resource
+      image_type:
         type: string
-      id:
-        description: id
-        type: integer
-      name:
-        $ref: "#/definitions/Name"
-    required:
-      - id
-      - name
-      - resource_type
+        x-go-custom-tag: 'bson:"image_type"'
+      image_filename:
+        x-go-custom-tag: 'bson:"image_filename"'
+        type: string
+      image_url:
+        x-go-custom-tag: 'bson:"image_url"'
+        type: string
 
   ListResult:
     type: object
@@ -45,73 +41,98 @@ definitions:
       name_en:
         type: string
         description: english
+        x-go-custom-tag: 'bson:"name_en"'
       name_cn:
         type: string
         description: chinese
+        x-go-custom-tag: 'bson:"name_cn"'
 
-  Weather:
-    type: string
-    enum:
-      - Any
-      - Rain
-      - Snow
+  # Weather:
+  #   type: string
+  #   enum:
+  #     - Any
+  #     - Rain
+  #     - Snow
 
-  Rarity:
-    type: string
-    enum:
-      - Common
-      - Uncommon
-      - Rare
-      - Ultra-rare
+  Colors:
+    type: array
+    items:
+      type: string
+
+  # Rarity:
+  #   type: string
+  #   enum:
+  #     - Common
+  #     - Uncommon
+  #     - Rare
+  #     - Ultra-rare
 
   Months:
     type: object
     properties:
       northern:
         type: array
+        x-go-custom-tag: 'bson:"northern"'
         items:
           type: integer
       southern:
         type: array
+        x-go-custom-tag: 'bson:"southern"'
         items:
           type: integer
 
-  Availability:
-    type: object
-    properties:
-      months:
-        $ref: "#/definitions/Months"
-      hours:
-        description: availability by hour range
-        type: array
-        items:
-          type: array
-          minLength: 2
-          maxLength: 2
-          items:
-            type: string
-      location:
-        type: string
-      weather:
-        type: array
-        items:
-          $ref: "#/definitions/Weather"
-      rarity:
-        $ref: "#/definitions/Rarity"
-
   Fish:
     type: object
-    allOf:
-      - $ref: "#/definitions/Resource"
-      - type: object
-        properties:
-          availability:
-            $ref: "#/definitions/Availability"
-          price:
-            type: number
-            format: integer
-          shadow:
-            type: string
+    properties:
+      id:
+        description: id
+        type: integer
+        x-go-custom-tag: 'bson:"id"'
+      entry_id:
+        description: entry id
+        type: string
+        x-go-custom-tag: 'bson:"entry_id"'
+      images:
+        type: array
+        x-go-custom-tag: 'bson:"images"'
+        items:
+          $ref: "#/definitions/Image"
+      name:
+        $ref: "#/definitions/Name"
+        x-go-custom-tag: 'bson:"name"'
+      sell_price:
+        x-go-custom-tag: 'bson:"sell_price"'
+        type: number
+        format: integer
+      shadow:
+        x-go-custom-tag: 'bson:"shadow"'
+        type: string
+      size:
+        x-go-custom-tag: 'bson:"size"'
+        type: string
+      months:
+        $ref: "#/definitions/Months"
+        x-go-custom-tag: 'bson:"months"'
+      hours:
+        description: availability by hour range
+        type: string
+        x-go-custom-tag: 'bson:"hours"'
+      location:
+        type: string
+        x-go-custom-tag: 'bson:"location"'
+      weather:
+        type: string
+        x-go-custom-tag: 'bson:"weather"'
+      catches_to_unlock:
+        type: integer
+        x-go-custom-tag: 'bson:"catches_to_unlock"'
+        format: int64
+      lighting_type:
+        type: string
+        x-go-custom-tag: 'bson:"lighting_type"'
+      colors:
+        $ref: "#/definitions/Colors"
+        x-go-custom-tag: 'bson:"colors"'
 
   FishListResult:
     type: object
@@ -123,31 +144,6 @@ definitions:
             type: array
             items:
               $ref: "#/definitions/Fish"
-
-  Bug:
-    type: object
-    allOf:
-      - $ref: "#/definitions/Resource"
-      - type: object
-        properties:
-          availability:
-            $ref: "#/definitions/Availability"
-          price:
-            type: number
-            format: integer
-          shadow:
-            type: string
-
-  BugListResult:
-    type: object
-    allOf:
-      - $ref: "#/definitions/ListResult"
-      - type: object
-        properties:
-          results:
-            type: array
-            items:
-              $ref: "#/definitions/Bug"
 
 parameters:
   SortBy:
@@ -202,37 +198,5 @@ paths:
           description: return a fish
           schema:
             $ref: "#/definitions/Fish"
-        404:
-          description: not found
-  /catalog/bugs:
-    get:
-      tags:
-        - bug
-      operationId: listBugs
-      parameters:
-        - $ref: "#/parameters/Cursor"
-        - $ref: "#/parameters/PageSize"
-        - $ref: "#/parameters/SortBy"
-      responses:
-        200:
-          description: return a list of bugs
-          schema:
-            $ref: "#/definitions/BugListResult"
-  /catalog/bugs/{id}:
-    get:
-      tags:
-        - bug
-      operationId: getBug
-      parameters:
-        - in: path
-          name: id
-          type: integer
-          required: true
-          description: Numeric ID of the bug to get.
-      responses:
-        200:
-          description: return a bug
-          schema:
-            $ref: "#/definitions/Bug"
         404:
           description: not found

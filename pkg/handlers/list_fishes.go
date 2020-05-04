@@ -6,26 +6,23 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/yishanhe/animalcrossing-api/models"
+	"github.com/yishanhe/animalcrossing-api/pkg/database"
 	"github.com/yishanhe/animalcrossing-api/pkg/entities"
 	"github.com/yishanhe/animalcrossing-api/restapi/operations/fish"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type listFishes struct {
-	db *mongo.Client
 }
 
-func NewListFishes(db *mongo.Client) fish.ListFishesHandler {
-	return &listFishes{
-		db: db,
-	}
+func NewListFishes() fish.ListFishesHandler {
+	return &listFishes{}
 }
 
 func (d *listFishes) Handle(params fish.ListFishesParams) middleware.Responder {
-	collection := d.db.Database("AnimalCrossingDB").Collection("fishes")
+	coll := database.NewMongoClient().Database("AnimalCrossingDB").Collection("fishes")
 
-	cursor, err := collection.Find(context.Background(), bson.M{})
+	cursor, err := coll.Find(context.Background(), bson.M{})
 
 	var results []*models.Fish
 	var count = 0

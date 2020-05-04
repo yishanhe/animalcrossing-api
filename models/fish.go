@@ -6,179 +6,78 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"bytes"
-	"encoding/json"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // Fish fish
 //
 // swagger:model Fish
 type Fish struct {
-	idField *int64
 
-	nameField *Name
+	// catches to unlock
+	CatchesToUnlock int64 `json:"catches_to_unlock,omitempty" bson:"catches_to_unlock"`
 
-	// availability
-	Availability *Availability `json:"availability,omitempty"`
+	// colors
+	Colors Colors `json:"colors,omitempty" bson:"colors"`
 
-	// price
-	Price int64 `json:"price,omitempty"`
+	// entry id
+	EntryID string `json:"entry_id,omitempty" bson:"entry_id"`
+
+	// availability by hour range
+	Hours string `json:"hours,omitempty" bson:"hours"`
+
+	// id
+	ID int64 `json:"id,omitempty" bson:"id"`
+
+	// images
+	Images []*Image `json:"images" bson:"images"`
+
+	// lighting type
+	LightingType string `json:"lighting_type,omitempty" bson:"lighting_type"`
+
+	// location
+	Location string `json:"location,omitempty" bson:"location"`
+
+	// months
+	Months *Months `json:"months,omitempty" bson:"months"`
+
+	// name
+	Name *Name `json:"name,omitempty" bson:"name"`
+
+	// sell price
+	SellPrice int64 `json:"sell_price,omitempty" bson:"sell_price"`
 
 	// shadow
-	Shadow string `json:"shadow,omitempty"`
-}
+	Shadow string `json:"shadow,omitempty" bson:"shadow"`
 
-// ID gets the id of this subtype
-func (m *Fish) ID() *int64 {
-	return m.idField
-}
+	// size
+	Size string `json:"size,omitempty" bson:"size"`
 
-// SetID sets the id of this subtype
-func (m *Fish) SetID(val *int64) {
-	m.idField = val
-}
-
-// Name gets the name of this subtype
-func (m *Fish) Name() *Name {
-	return m.nameField
-}
-
-// SetName sets the name of this subtype
-func (m *Fish) SetName(val *Name) {
-	m.nameField = val
-}
-
-// ResourceType gets the resource type of this subtype
-func (m *Fish) ResourceType() string {
-	return "Fish"
-}
-
-// SetResourceType sets the resource type of this subtype
-func (m *Fish) SetResourceType(val string) {
-}
-
-// UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
-func (m *Fish) UnmarshalJSON(raw []byte) error {
-	var data struct {
-
-		// availability
-		Availability *Availability `json:"availability,omitempty"`
-
-		// price
-		Price int64 `json:"price,omitempty"`
-
-		// shadow
-		Shadow string `json:"shadow,omitempty"`
-	}
-	buf := bytes.NewBuffer(raw)
-	dec := json.NewDecoder(buf)
-	dec.UseNumber()
-
-	if err := dec.Decode(&data); err != nil {
-		return err
-	}
-
-	var base struct {
-		/* Just the base type fields. Used for unmashalling polymorphic types.*/
-
-		ID *int64 `json:"id"`
-
-		Name *Name `json:"name"`
-
-		ResourceType string `json:"resource_type"`
-	}
-	buf = bytes.NewBuffer(raw)
-	dec = json.NewDecoder(buf)
-	dec.UseNumber()
-
-	if err := dec.Decode(&base); err != nil {
-		return err
-	}
-
-	var result Fish
-
-	result.idField = base.ID
-
-	result.nameField = base.Name
-
-	if base.ResourceType != result.ResourceType() {
-		/* Not the type we're looking for. */
-		return errors.New(422, "invalid resource_type value: %q", base.ResourceType)
-	}
-
-	result.Availability = data.Availability
-	result.Price = data.Price
-	result.Shadow = data.Shadow
-
-	*m = result
-
-	return nil
-}
-
-// MarshalJSON marshals this object with a polymorphic type to a JSON structure
-func (m Fish) MarshalJSON() ([]byte, error) {
-	var b1, b2, b3 []byte
-	var err error
-	b1, err = json.Marshal(struct {
-
-		// availability
-		Availability *Availability `json:"availability,omitempty"`
-
-		// price
-		Price int64 `json:"price,omitempty"`
-
-		// shadow
-		Shadow string `json:"shadow,omitempty"`
-	}{
-
-		Availability: m.Availability,
-
-		Price: m.Price,
-
-		Shadow: m.Shadow,
-	})
-	if err != nil {
-		return nil, err
-	}
-	b2, err = json.Marshal(struct {
-		ID *int64 `json:"id"`
-
-		Name *Name `json:"name"`
-
-		ResourceType string `json:"resource_type"`
-	}{
-
-		ID: m.ID(),
-
-		Name: m.Name(),
-
-		ResourceType: m.ResourceType(),
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return swag.ConcatJSON(b1, b2, b3), nil
+	// weather
+	Weather string `json:"weather,omitempty" bson:"weather"`
 }
 
 // Validate validates this fish
 func (m *Fish) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateID(formats); err != nil {
+	if err := m.validateColors(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateImages(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateMonths(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateName(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateAvailability(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -188,25 +87,57 @@ func (m *Fish) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Fish) validateID(formats strfmt.Registry) error {
+func (m *Fish) validateColors(formats strfmt.Registry) error {
 
-	if err := validate.Required("id", "body", m.ID()); err != nil {
+	if swag.IsZero(m.Colors) { // not required
+		return nil
+	}
+
+	if err := m.Colors.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("colors")
+		}
 		return err
 	}
 
 	return nil
 }
 
-func (m *Fish) validateName(formats strfmt.Registry) error {
+func (m *Fish) validateImages(formats strfmt.Registry) error {
 
-	if err := validate.Required("name", "body", m.Name()); err != nil {
-		return err
+	if swag.IsZero(m.Images) { // not required
+		return nil
 	}
 
-	if m.Name() != nil {
-		if err := m.Name().Validate(formats); err != nil {
+	for i := 0; i < len(m.Images); i++ {
+		if swag.IsZero(m.Images[i]) { // not required
+			continue
+		}
+
+		if m.Images[i] != nil {
+			if err := m.Images[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("images" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *Fish) validateMonths(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Months) { // not required
+		return nil
+	}
+
+	if m.Months != nil {
+		if err := m.Months.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("name")
+				return ve.ValidateName("months")
 			}
 			return err
 		}
@@ -215,16 +146,16 @@ func (m *Fish) validateName(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Fish) validateAvailability(formats strfmt.Registry) error {
+func (m *Fish) validateName(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Availability) { // not required
+	if swag.IsZero(m.Name) { // not required
 		return nil
 	}
 
-	if m.Availability != nil {
-		if err := m.Availability.Validate(formats); err != nil {
+	if m.Name != nil {
+		if err := m.Name.Validate(formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("availability")
+				return ve.ValidateName("name")
 			}
 			return err
 		}

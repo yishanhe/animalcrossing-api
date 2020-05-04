@@ -16,10 +16,10 @@ import (
 type Months struct {
 
 	// northern
-	Northern []int64 `json:"northern"`
+	Northern []int64 `json:"northern" bson:"northern"`
 
 	// southern
-	Southern []int64 `json:"southern"`
+	Southern []int64 `json:"southern" bson:"southern"`
 }
 
 // Validate validates this months

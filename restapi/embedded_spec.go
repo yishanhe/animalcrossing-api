@@ -32,61 +32,6 @@ func init() {
   "host": "localhost:8322",
   "basePath": "/api/v1",
   "paths": {
-    "/catalog/bugs": {
-      "get": {
-        "tags": [
-          "bug"
-        ],
-        "operationId": "listBugs",
-        "parameters": [
-          {
-            "$ref": "#/parameters/Cursor"
-          },
-          {
-            "$ref": "#/parameters/PageSize"
-          },
-          {
-            "$ref": "#/parameters/SortBy"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return a list of bugs",
-            "schema": {
-              "$ref": "#/definitions/BugListResult"
-            }
-          }
-        }
-      }
-    },
-    "/catalog/bugs/{id}": {
-      "get": {
-        "tags": [
-          "bug"
-        ],
-        "operationId": "getBug",
-        "parameters": [
-          {
-            "type": "integer",
-            "description": "Numeric ID of the bug to get.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return a bug",
-            "schema": {
-              "$ref": "#/definitions/Bug"
-            }
-          },
-          "404": {
-            "description": "not found"
-          }
-        }
-      }
-    },
     "/catalog/fishes": {
       "get": {
         "tags": [
@@ -144,102 +89,80 @@ func init() {
     }
   },
   "definitions": {
-    "Availability": {
-      "type": "object",
-      "properties": {
-        "hours": {
-          "description": "availability by hour range",
-          "type": "array",
-          "items": {
-            "type": "array",
-            "maxLength": 2,
-            "minLength": 2,
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "location": {
-          "type": "string"
-        },
-        "months": {
-          "$ref": "#/definitions/Months"
-        },
-        "rarity": {
-          "$ref": "#/definitions/Rarity"
-        },
-        "weather": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Weather"
-          }
-        }
+    "Colors": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
-    },
-    "Bug": {
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/Resource"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "availability": {
-              "$ref": "#/definitions/Availability"
-            },
-            "price": {
-              "type": "number",
-              "format": "integer"
-            },
-            "shadow": {
-              "type": "string"
-            }
-          }
-        }
-      ]
-    },
-    "BugListResult": {
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/ListResult"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "results": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Bug"
-              }
-            }
-          }
-        }
-      ]
     },
     "Fish": {
       "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/Resource"
+      "properties": {
+        "catches_to_unlock": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-custom-tag": "bson:\"catches_to_unlock\""
         },
-        {
-          "type": "object",
-          "properties": {
-            "availability": {
-              "$ref": "#/definitions/Availability"
-            },
-            "price": {
-              "type": "number",
-              "format": "integer"
-            },
-            "shadow": {
-              "type": "string"
-            }
-          }
+        "colors": {
+          "x-go-custom-tag": "bson:\"colors\"",
+          "$ref": "#/definitions/Colors"
+        },
+        "entry_id": {
+          "description": "entry id",
+          "type": "string",
+          "x-go-custom-tag": "bson:\"entry_id\""
+        },
+        "hours": {
+          "description": "availability by hour range",
+          "type": "string",
+          "x-go-custom-tag": "bson:\"hours\""
+        },
+        "id": {
+          "description": "id",
+          "type": "integer",
+          "x-go-custom-tag": "bson:\"id\""
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Image"
+          },
+          "x-go-custom-tag": "bson:\"images\""
+        },
+        "lighting_type": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"lighting_type\""
+        },
+        "location": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"location\""
+        },
+        "months": {
+          "x-go-custom-tag": "bson:\"months\"",
+          "$ref": "#/definitions/Months"
+        },
+        "name": {
+          "x-go-custom-tag": "bson:\"name\"",
+          "$ref": "#/definitions/Name"
+        },
+        "sell_price": {
+          "type": "number",
+          "format": "integer",
+          "x-go-custom-tag": "bson:\"sell_price\""
+        },
+        "shadow": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"shadow\""
+        },
+        "size": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"size\""
+        },
+        "weather": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"weather\""
         }
-      ]
+      }
     },
     "FishListResult": {
       "type": "object",
@@ -259,6 +182,24 @@ func init() {
           }
         }
       ]
+    },
+    "Image": {
+      "description": "image",
+      "type": "object",
+      "properties": {
+        "image_filename": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"image_filename\""
+        },
+        "image_type": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"image_type\""
+        },
+        "image_url": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"image_url\""
+        }
+      }
     },
     "ListResult": {
       "description": "The list object",
@@ -281,13 +222,15 @@ func init() {
           "type": "array",
           "items": {
             "type": "integer"
-          }
+          },
+          "x-go-custom-tag": "bson:\"northern\""
         },
         "southern": {
           "type": "array",
           "items": {
             "type": "integer"
-          }
+          },
+          "x-go-custom-tag": "bson:\"southern\""
         }
       }
     },
@@ -296,53 +239,15 @@ func init() {
       "properties": {
         "name_cn": {
           "description": "chinese",
-          "type": "string"
+          "type": "string",
+          "x-go-custom-tag": "bson:\"name_cn\""
         },
         "name_en": {
           "description": "english",
-          "type": "string"
+          "type": "string",
+          "x-go-custom-tag": "bson:\"name_en\""
         }
       }
-    },
-    "Rarity": {
-      "type": "string",
-      "enum": [
-        "Common",
-        "Uncommon",
-        "Rare",
-        "Ultra-rare"
-      ]
-    },
-    "Resource": {
-      "description": "The basic object",
-      "type": "object",
-      "required": [
-        "id",
-        "name",
-        "resource_type"
-      ],
-      "properties": {
-        "id": {
-          "description": "id",
-          "type": "integer"
-        },
-        "name": {
-          "$ref": "#/definitions/Name"
-        },
-        "resource_type": {
-          "description": "type of the resource",
-          "type": "string"
-        }
-      },
-      "discriminator": "resource_type"
-    },
-    "Weather": {
-      "type": "string",
-      "enum": [
-        "Any",
-        "Rain",
-        "Snow"
-      ]
     }
   },
   "parameters": {
@@ -382,72 +287,6 @@ func init() {
   "host": "localhost:8322",
   "basePath": "/api/v1",
   "paths": {
-    "/catalog/bugs": {
-      "get": {
-        "tags": [
-          "bug"
-        ],
-        "operationId": "listBugs",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "cursor",
-            "in": "query"
-          },
-          {
-            "maximum": 1000,
-            "minimum": 0,
-            "type": "integer",
-            "default": 20,
-            "description": "Maximal number of record return in one page, server may return less.",
-            "name": "page_size",
-            "in": "query"
-          },
-          {
-            "type": "string",
-            "description": "Fields by which the records are sorted",
-            "name": "sort_by",
-            "in": "query"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return a list of bugs",
-            "schema": {
-              "$ref": "#/definitions/BugListResult"
-            }
-          }
-        }
-      }
-    },
-    "/catalog/bugs/{id}": {
-      "get": {
-        "tags": [
-          "bug"
-        ],
-        "operationId": "getBug",
-        "parameters": [
-          {
-            "type": "integer",
-            "description": "Numeric ID of the bug to get.",
-            "name": "id",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "return a bug",
-            "schema": {
-              "$ref": "#/definitions/Bug"
-            }
-          },
-          "404": {
-            "description": "not found"
-          }
-        }
-      }
-    },
     "/catalog/fishes": {
       "get": {
         "tags": [
@@ -516,102 +355,80 @@ func init() {
     }
   },
   "definitions": {
-    "Availability": {
-      "type": "object",
-      "properties": {
-        "hours": {
-          "description": "availability by hour range",
-          "type": "array",
-          "items": {
-            "type": "array",
-            "maxLength": 2,
-            "minLength": 2,
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "location": {
-          "type": "string"
-        },
-        "months": {
-          "$ref": "#/definitions/Months"
-        },
-        "rarity": {
-          "$ref": "#/definitions/Rarity"
-        },
-        "weather": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Weather"
-          }
-        }
+    "Colors": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
-    },
-    "Bug": {
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/Resource"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "availability": {
-              "$ref": "#/definitions/Availability"
-            },
-            "price": {
-              "type": "number",
-              "format": "integer"
-            },
-            "shadow": {
-              "type": "string"
-            }
-          }
-        }
-      ]
-    },
-    "BugListResult": {
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/ListResult"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "results": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Bug"
-              }
-            }
-          }
-        }
-      ]
     },
     "Fish": {
       "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/Resource"
+      "properties": {
+        "catches_to_unlock": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-custom-tag": "bson:\"catches_to_unlock\""
         },
-        {
-          "type": "object",
-          "properties": {
-            "availability": {
-              "$ref": "#/definitions/Availability"
-            },
-            "price": {
-              "type": "number",
-              "format": "integer"
-            },
-            "shadow": {
-              "type": "string"
-            }
-          }
+        "colors": {
+          "x-go-custom-tag": "bson:\"colors\"",
+          "$ref": "#/definitions/Colors"
+        },
+        "entry_id": {
+          "description": "entry id",
+          "type": "string",
+          "x-go-custom-tag": "bson:\"entry_id\""
+        },
+        "hours": {
+          "description": "availability by hour range",
+          "type": "string",
+          "x-go-custom-tag": "bson:\"hours\""
+        },
+        "id": {
+          "description": "id",
+          "type": "integer",
+          "x-go-custom-tag": "bson:\"id\""
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Image"
+          },
+          "x-go-custom-tag": "bson:\"images\""
+        },
+        "lighting_type": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"lighting_type\""
+        },
+        "location": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"location\""
+        },
+        "months": {
+          "x-go-custom-tag": "bson:\"months\"",
+          "$ref": "#/definitions/Months"
+        },
+        "name": {
+          "x-go-custom-tag": "bson:\"name\"",
+          "$ref": "#/definitions/Name"
+        },
+        "sell_price": {
+          "type": "number",
+          "format": "integer",
+          "x-go-custom-tag": "bson:\"sell_price\""
+        },
+        "shadow": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"shadow\""
+        },
+        "size": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"size\""
+        },
+        "weather": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"weather\""
         }
-      ]
+      }
     },
     "FishListResult": {
       "type": "object",
@@ -631,6 +448,24 @@ func init() {
           }
         }
       ]
+    },
+    "Image": {
+      "description": "image",
+      "type": "object",
+      "properties": {
+        "image_filename": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"image_filename\""
+        },
+        "image_type": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"image_type\""
+        },
+        "image_url": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"image_url\""
+        }
+      }
     },
     "ListResult": {
       "description": "The list object",
@@ -653,13 +488,15 @@ func init() {
           "type": "array",
           "items": {
             "type": "integer"
-          }
+          },
+          "x-go-custom-tag": "bson:\"northern\""
         },
         "southern": {
           "type": "array",
           "items": {
             "type": "integer"
-          }
+          },
+          "x-go-custom-tag": "bson:\"southern\""
         }
       }
     },
@@ -668,53 +505,15 @@ func init() {
       "properties": {
         "name_cn": {
           "description": "chinese",
-          "type": "string"
+          "type": "string",
+          "x-go-custom-tag": "bson:\"name_cn\""
         },
         "name_en": {
           "description": "english",
-          "type": "string"
+          "type": "string",
+          "x-go-custom-tag": "bson:\"name_en\""
         }
       }
-    },
-    "Rarity": {
-      "type": "string",
-      "enum": [
-        "Common",
-        "Uncommon",
-        "Rare",
-        "Ultra-rare"
-      ]
-    },
-    "Resource": {
-      "description": "The basic object",
-      "type": "object",
-      "required": [
-        "id",
-        "name",
-        "resource_type"
-      ],
-      "properties": {
-        "id": {
-          "description": "id",
-          "type": "integer"
-        },
-        "name": {
-          "$ref": "#/definitions/Name"
-        },
-        "resource_type": {
-          "description": "type of the resource",
-          "type": "string"
-        }
-      },
-      "discriminator": "resource_type"
-    },
-    "Weather": {
-      "type": "string",
-      "enum": [
-        "Any",
-        "Rain",
-        "Snow"
-      ]
     }
   },
   "parameters": {

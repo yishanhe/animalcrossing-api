@@ -174,4 +174,10 @@ tags
 
 # End of https://www.gitignore.io/api/go,vim,macos,intellij+all,visualstudiocode
 
+# Go Swagger
 tmp
+
+# Google APIs
+
+credentials.json
+token.json

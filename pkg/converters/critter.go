@@ -4,7 +4,7 @@ import "github.com/yishanhe/animalcrossing-api/pkg/entities"
 
 import "github.com/yishanhe/animalcrossing-api/models"
 
-func ToFishDTO(entity entities.Critter) *models.Fish {
+func ToFishDTO(entity *entities.Critter) *models.Fish {
 	ele := &models.Fish{
 		Price:  entity.Sell,
 		Shadow: entity.Shadow,
@@ -32,7 +32,7 @@ func ToFishDTO(entity entities.Critter) *models.Fish {
 	return ele
 }
 
-func ToBugDTO(entity entities.Critter) *models.Fish {
+func ToBugDTO(entity *entities.Critter) *models.Bug {
 	ele := &models.Bug{
 		Price:  entity.Sell,
 		Shadow: entity.Shadow,

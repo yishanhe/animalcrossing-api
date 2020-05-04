@@ -6,24 +6,22 @@ import (
 
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/yishanhe/animalcrossing-api/models"
+	"github.com/yishanhe/animalcrossing-api/pkg/database"
 	"github.com/yishanhe/animalcrossing-api/pkg/entities"
 	"github.com/yishanhe/animalcrossing-api/restapi/operations/bug"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type listBugs struct {
-	db *mongo.Client
 }
 
-func NewListBugs(db *mongo.Client) bug.ListBugsHandler {
-	return &listBugs{
-		db: db,
-	}
+func NewListBugs() bug.ListBugsHandler {
+	return &listBugs{}
 }
 
 func (d *listBugs) Handle(params bug.ListBugsParams) middleware.Responder {
-	coll := d.db.Database("AnimalCrossingDB").Collection("bugs")
+
+	coll := database.NewMongoClient().Database("AnimalCrossingDB").Collection("bugs")
 
 	cursor, err := coll.Find(context.Background(), bson.M{})
 
@@ -70,4 +68,3 @@ func (d *listBugs) Handle(params bug.ListBugsParams) middleware.Responder {
 	}
 	return bug.NewListBugsOK().WithPayload(listResult)
 }
-

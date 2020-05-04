@@ -10,7 +10,6 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/yishanhe/animalcrossing-api/pkg/database"
 	"github.com/yishanhe/animalcrossing-api/pkg/handlers"
 	"github.com/yishanhe/animalcrossing-api/restapi/operations"
 	"github.com/yishanhe/animalcrossing-api/restapi/operations/bug"
@@ -42,20 +41,16 @@ func configureAPI(api *operations.AcnhAPI) http.Handler {
 			return middleware.NotImplemented("operation bug.GetBug has not yet been implemented")
 		})
 	}
-	if api.FishGetFishHandler == nil {
-		api.FishGetFishHandler = fish.GetFishHandlerFunc(func(params fish.GetFishParams) middleware.Responder {
-			return middleware.NotImplemented("operation fish.GetFish has not yet been implemented")
-		})
-	}
+	api.FishGetFishHandler = fish.GetFishHandlerFunc(func(params fish.GetFishParams) middleware.Responder {
+		return handlers.NewGetFishById().Handle(params)
+	})
 
 	api.BugListBugsHandler = bug.ListBugsHandlerFunc(func(params bug.ListBugsParams) middleware.Responder {
-		dbClient := database.NewDatabaseClient()
-		return handlers.NewListBugs(dbClient).Handle(params)
+		return handlers.NewListBugs().Handle(params)
 	})
 
 	api.FishListFishesHandler = fish.ListFishesHandlerFunc(func(params fish.ListFishesParams) middleware.Responder {
-		dbClient := database.NewDatabaseClient()
-		return handlers.NewListFishes(dbClient).Handle(params)
+		return handlers.NewListFishes().Handle(params)
 	})
 
 	api.PreServerShutdown = func() {}
