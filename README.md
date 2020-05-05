@@ -35,3 +35,8 @@ npm install -g ibm-openapi-validator
 ## Google Sheets API 
 
 https://developers.google.com/sheets/api/quickstart/go
+
+
+
+
+## http://dev.animalcrossing.news/docs

@@ -81,6 +81,50 @@ definitions:
         items:
           type: integer
 
+  Bug:
+    type: object
+    properties:
+      id:
+        description: id
+        type: integer
+        x-go-custom-tag: 'bson:"id"'
+      entry_id:
+        description: entry id
+        type: string
+        x-go-custom-tag: 'bson:"entry_id"'
+      images:
+        type: array
+        x-go-custom-tag: 'bson:"images"'
+        items:
+          $ref: "#/definitions/Image"
+      name:
+        $ref: "#/definitions/Name"
+        x-go-custom-tag: 'bson:"name"'
+      sell_price:
+        x-go-custom-tag: 'bson:"sell_price"'
+        type: number
+        format: integer
+      months:
+        $ref: "#/definitions/Months"
+        x-go-custom-tag: 'bson:"months"'
+      hours:
+        description: availability by hour range
+        type: string
+        x-go-custom-tag: 'bson:"hours"'
+      location:
+        type: string
+        x-go-custom-tag: 'bson:"location"'
+      weather:
+        type: string
+        x-go-custom-tag: 'bson:"weather"'
+      catches_to_unlock:
+        type: integer
+        x-go-custom-tag: 'bson:"catches_to_unlock"'
+        format: int64
+      colors:
+        $ref: "#/definitions/Colors"
+        x-go-custom-tag: 'bson:"colors"'
+
   Fish:
     type: object
     properties:

@@ -24,6 +24,7 @@ var (
 
 func init() {
 	headerMap["Fish"] = []string{"#", "Name", "Icon Image", "Critterpedia Image", "Furniture Image", "Sell", "Where/How", "Shadow", "Total Catches to Unlock", "Rain/Snow Catch Up", "NH Jan", "NH Feb", "NH Mar", "NH Apr", "NH May", "NH Jun", "NH Jul", "NH Aug", "NH Sep", "NH Oct", "NH Nov", "NH Dec", "SH Jan", "SH Feb", "SH Mar", "SH Apr", "SH May", "SH Jun", "SH Jul", "SH Aug", "SH Sep", "SH Oct", "SH Nov", "SH Dec", "Color 1", "Color 2", "Size", "Lighting Type", "Icon Filename", "Critterpedia Filename", "Furniture Filename", "Internal ID", "Unique Entry ID"}
+	headerMap["Bugs"] = []string{"#", "Name", "Icon Image", "Critterpedia Image", "Furniture Image", "Sell", "Where/How", "Weather", "Total Catches to Unlock", "NH Jan", "NH Feb", "NH Mar", "NH Apr", "NH May", "NH Jun", "NH Jul", "NH Aug", "NH Sep", "NH Oct", "NH Nov", "NH Dec", "SH Jan", "SH Feb", "SH Mar", "SH Apr", "SH May", "SH Jun", "SH Jul", "SH Aug", "SH Sep", "SH Oct", "SH Nov", "SH Dec", "Color 1", "Color 2", "Icon Filename", "Critterpedia Filename", "Furniture Filename", "Internal ID", "Unique Entry ID"}
 }
 
 // Retrieve a token, saves the token, then returns the generated client.
@@ -100,27 +101,117 @@ func main() {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 
-	spreadsheetId := "13d_LAJPlxMa_DubPTuirkIV4DERBMXbrWQsmSh8ReK4"
-	readRange := "Fish"
-	resp, err := srv.Spreadsheets.Values.Get(spreadsheetId, readRange).ValueRenderOption("FORMULA").Do()
-	// a, err := resp.MarshalJSON()
-	// fmt.Println(string(a))
+	readBugSheet(srv)
 
-	coll := database.NewMongoClient().Database("AnimalCrossingDevDB").Collection("fish")
-	headerSkipped := false
+}
+
+func readBugSheet(srv *sheets.Service) {
+	spreadsheetID := "13d_LAJPlxMa_DubPTuirkIV4DERBMXbrWQsmSh8ReK4"
+	readRange := "Bugs"
+	resp, err := srv.Spreadsheets.Values.Get(spreadsheetID, readRange).ValueRenderOption("FORMULA").Do()
+	if err != nil {
+		log.Fatalf("Unable to retrieve Sheet %s %v", readRange, err)
+	}
+	coll := database.NewMongoClient().Database("AnimalCrossingDevDB").Collection("bug")
+	headerProcessed := false
+
 	if len(resp.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
 		for _, row := range resp.Values {
-			if !headerSkipped {
-				headerSkipped = true
+			if !headerProcessed {
+				headerProcessed = true
+				validateHeader(row, "Bugs")
+				continue
+			}
+			sellPriceInFloat, ok := row[5].(float64)
+			if !ok {
+				log.Fatal("Type not right")
+			}
+			catchesToUnlockInFloat, ok := row[8].(float64)
+			if !ok {
+				log.Fatal("Type not right")
+			}
+			idInFloat, ok := row[38].(float64)
+			if !ok {
+				log.Fatal("Type not right")
+			}
+
+			months, hours := extractActiveTime(row, 9, 21)
+			images := []*models.Image{}
+			images = append(images, &models.Image{
+				ImageType:     "Icon Image",
+				ImageFilename: fmt.Sprintf("%s", row[35]),
+				ImageURL:      strings.TrimSuffix(strings.TrimPrefix(fmt.Sprintf("%s", row[2]), "=IMAGE(\""), "\")"),
+			})
+			images = append(images, &models.Image{
+				ImageType:     "Critterpedia Image",
+				ImageFilename: fmt.Sprintf("%s", row[36]),
+				ImageURL:      fmt.Sprintf("%s", row[3]),
+			})
+			images = append(images, &models.Image{
+				ImageType:     "Furniture Image",
+				ImageFilename: fmt.Sprintf("%s", row[37]),
+				ImageURL:      fmt.Sprintf("%s", row[4]),
+			})
+
+			// color 33 34
+			colors := []string{
+				fmt.Sprintf("%s", row[33]), fmt.Sprintf("%s", row[34]),
+			}
+
+			var ele *models.Bug
+			ele = &models.Bug{
+				ID:      int64(idInFloat),
+				EntryID: fmt.Sprintf("%s", row[39]),
+				Name: &models.Name{
+					NameEn: fmt.Sprintf("%s", row[1]),
+				},
+				SellPrice:       int64(sellPriceInFloat),
+				Months:          &months,
+				Hours:           hours,
+				Location:        fmt.Sprintf("%s", row[6]),
+				CatchesToUnlock: int64(catchesToUnlockInFloat),
+				Weather:         fmt.Sprintf("%s", row[7]),
+				Images:          images,
+				Colors:          colors,
+			}
+
+			data, err := bson.Marshal(ele)
+			if err != nil {
+				continue
+			}
+			// utils.PrettyPrint(ele)
+			coll.InsertOne(context.Background(), data)
+
+		}
+	}
+}
+
+func readFishSheet(srv *sheets.Service) {
+
+	spreadsheetID := "13d_LAJPlxMa_DubPTuirkIV4DERBMXbrWQsmSh8ReK4"
+	readRange := "Fish"
+	resp, err := srv.Spreadsheets.Values.Get(spreadsheetID, readRange).ValueRenderOption("FORMULA").Do()
+	if err != nil {
+		log.Fatalf("Unable to retrieve Sheet %s %v", readRange, err)
+	}
+	// a, err := resp.MarshalJSON()
+	// fmt.Println(string(a))
+
+	coll := database.NewMongoClient().Database("AnimalCrossingDevDB").Collection("fish")
+
+	// TODO: create inedex
+	headerProcessed := false
+	if len(resp.Values) == 0 {
+		fmt.Println("No data found.")
+	} else {
+		for _, row := range resp.Values {
+			if !headerProcessed {
+				headerProcessed = true
 				validateHeader(row, "Fish")
 				continue
 			}
-			// sellPrice, _ := strconv.ParseInt(fmt.Sprintf("%s", row[5]), 10, 64)
-			// catchesToUnlock, _ := strconv.ParseInt(fmt.Sprintf("%s", row[8]), 10, 64)
-			// fmt.Println(fmt.Sprintf("%s", row[5]))
-			// fmt.Println(catchesToUnlock)
 			sellPriceInFloat, ok := row[5].(float64)
 			if !ok {
 				log.Fatal("Type not right")
@@ -174,6 +265,7 @@ func main() {
 				Images:          images,
 				Size:            fmt.Sprintf("%s", row[36]),
 				Colors:          colors,
+				LightingType:    fmt.Sprintf("%s", row[37]),
 			}
 
 			data, err := bson.Marshal(ele)
@@ -186,7 +278,6 @@ func main() {
 		}
 
 	}
-
 }
 
 func validateHeader(row []interface{}, sheet string) {
@@ -225,4 +316,10 @@ func extractActiveTime(row []interface{}, nhStartIdx int, shStartIdx int) (model
 	}
 
 	return months, hour
+}
+
+func printHeader(row []interface{}) {
+	for _, header := range row {
+		fmt.Printf("\"%s\",", header)
+	}
 }

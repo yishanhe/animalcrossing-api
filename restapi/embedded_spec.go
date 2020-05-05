@@ -89,6 +89,63 @@ func init() {
     }
   },
   "definitions": {
+    "Bug": {
+      "type": "object",
+      "properties": {
+        "catches_to_unlock": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-custom-tag": "bson:\"catches_to_unlock\""
+        },
+        "colors": {
+          "x-go-custom-tag": "bson:\"colors\"",
+          "$ref": "#/definitions/Colors"
+        },
+        "entry_id": {
+          "description": "entry id",
+          "type": "string",
+          "x-go-custom-tag": "bson:\"entry_id\""
+        },
+        "hours": {
+          "description": "availability by hour range",
+          "type": "string",
+          "x-go-custom-tag": "bson:\"hours\""
+        },
+        "id": {
+          "description": "id",
+          "type": "integer",
+          "x-go-custom-tag": "bson:\"id\""
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Image"
+          },
+          "x-go-custom-tag": "bson:\"images\""
+        },
+        "location": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"location\""
+        },
+        "months": {
+          "x-go-custom-tag": "bson:\"months\"",
+          "$ref": "#/definitions/Months"
+        },
+        "name": {
+          "x-go-custom-tag": "bson:\"name\"",
+          "$ref": "#/definitions/Name"
+        },
+        "sell_price": {
+          "type": "number",
+          "format": "integer",
+          "x-go-custom-tag": "bson:\"sell_price\""
+        },
+        "weather": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"weather\""
+        }
+      }
+    },
     "Colors": {
       "type": "array",
       "items": {
@@ -355,6 +412,63 @@ func init() {
     }
   },
   "definitions": {
+    "Bug": {
+      "type": "object",
+      "properties": {
+        "catches_to_unlock": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-custom-tag": "bson:\"catches_to_unlock\""
+        },
+        "colors": {
+          "x-go-custom-tag": "bson:\"colors\"",
+          "$ref": "#/definitions/Colors"
+        },
+        "entry_id": {
+          "description": "entry id",
+          "type": "string",
+          "x-go-custom-tag": "bson:\"entry_id\""
+        },
+        "hours": {
+          "description": "availability by hour range",
+          "type": "string",
+          "x-go-custom-tag": "bson:\"hours\""
+        },
+        "id": {
+          "description": "id",
+          "type": "integer",
+          "x-go-custom-tag": "bson:\"id\""
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Image"
+          },
+          "x-go-custom-tag": "bson:\"images\""
+        },
+        "location": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"location\""
+        },
+        "months": {
+          "x-go-custom-tag": "bson:\"months\"",
+          "$ref": "#/definitions/Months"
+        },
+        "name": {
+          "x-go-custom-tag": "bson:\"name\"",
+          "$ref": "#/definitions/Name"
+        },
+        "sell_price": {
+          "type": "number",
+          "format": "integer",
+          "x-go-custom-tag": "bson:\"sell_price\""
+        },
+        "weather": {
+          "type": "string",
+          "x-go-custom-tag": "bson:\"weather\""
+        }
+      }
+    },
     "Colors": {
       "type": "array",
       "items": {
