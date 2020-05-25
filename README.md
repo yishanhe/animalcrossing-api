@@ -22,11 +22,9 @@
 
 
 
-## https://gorm.io/
 
 
-
-## Openapi Validator 
+## additional Openapi Validator 
 
 npm install -g ibm-openapi-validator
 
@@ -38,5 +36,3 @@ https://developers.google.com/sheets/api/quickstart/go
 
 
 
-
-## http://dev.animalcrossing.news/docs
