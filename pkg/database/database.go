@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/yishanhe/animalcrossing-api/pkg/entities"
+	"github.com/yishanhe/animalcrossing-api/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -16,7 +16,7 @@ type dbClient struct {
 }
 
 type AnimalCrossingDB interface {
-	FindCritterByID(id int, resourceType string) (*entities.Critter, error)
+	FindBugByID(id int, resourceType string) (*models.Bug, error)
 }
 
 func NewMongoClient() *mongo.Client {
@@ -47,12 +47,12 @@ func NewDatabaseClient() AnimalCrossingDB {
 	}
 }
 
-func (d dbClient) FindCritterByID(id int, resourceType string) (*entities.Critter, error) {
-	coll := d.db.Database("AnimalCrossingDB").Collection(resourceType)
+func (d dbClient) FindBugByID(id int, resourceType string) (*models.Bug, error) {
+	coll := d.db.Database("AnimalCrossingDevDB").Collection(resourceType)
 	filter := bson.M{
-		"internalId": id,
+		"id": id,
 	}
-	var found *entities.Critter
+	var found *models.Bug
 	err := coll.FindOne(context.Background(), filter).Decode(&found)
 	if err != nil && err != mongo.ErrNoDocuments {
 		log.Panicln(err)

@@ -32,6 +32,61 @@ func init() {
   "host": "localhost:8322",
   "basePath": "/api/v1",
   "paths": {
+    "/catalog/bugs": {
+      "get": {
+        "tags": [
+          "bug"
+        ],
+        "operationId": "listBugs",
+        "parameters": [
+          {
+            "$ref": "#/parameters/Cursor"
+          },
+          {
+            "$ref": "#/parameters/PageSize"
+          },
+          {
+            "$ref": "#/parameters/SortBy"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "returns a list of fishes",
+            "schema": {
+              "$ref": "#/definitions/BugListResult"
+            }
+          }
+        }
+      }
+    },
+    "/catalog/bugs/{id}": {
+      "get": {
+        "tags": [
+          "bug"
+        ],
+        "operationId": "getBug",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Numeric ID of the bug to get.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return a bug",
+            "schema": {
+              "$ref": "#/definitions/Bug"
+            }
+          },
+          "404": {
+            "description": "not found"
+          }
+        }
+      }
+    },
     "/catalog/fishes": {
       "get": {
         "tags": [
@@ -145,6 +200,25 @@ func init() {
           "x-go-custom-tag": "bson:\"weather\""
         }
       }
+    },
+    "BugListResult": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/ListResult"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Bug"
+              }
+            }
+          }
+        }
+      ]
     },
     "Colors": {
       "type": "array",
@@ -344,6 +418,72 @@ func init() {
   "host": "localhost:8322",
   "basePath": "/api/v1",
   "paths": {
+    "/catalog/bugs": {
+      "get": {
+        "tags": [
+          "bug"
+        ],
+        "operationId": "listBugs",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "cursor",
+            "in": "query"
+          },
+          {
+            "maximum": 1000,
+            "minimum": 0,
+            "type": "integer",
+            "default": 20,
+            "description": "Maximal number of record return in one page, server may return less.",
+            "name": "page_size",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Fields by which the records are sorted",
+            "name": "sort_by",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "returns a list of fishes",
+            "schema": {
+              "$ref": "#/definitions/BugListResult"
+            }
+          }
+        }
+      }
+    },
+    "/catalog/bugs/{id}": {
+      "get": {
+        "tags": [
+          "bug"
+        ],
+        "operationId": "getBug",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Numeric ID of the bug to get.",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "return a bug",
+            "schema": {
+              "$ref": "#/definitions/Bug"
+            }
+          },
+          "404": {
+            "description": "not found"
+          }
+        }
+      }
+    },
     "/catalog/fishes": {
       "get": {
         "tags": [
@@ -468,6 +608,25 @@ func init() {
           "x-go-custom-tag": "bson:\"weather\""
         }
       }
+    },
+    "BugListResult": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/ListResult"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Bug"
+              }
+            }
+          }
+        }
+      ]
     },
     "Colors": {
       "type": "array",

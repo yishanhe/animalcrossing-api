@@ -16,7 +16,7 @@ import (
 // ListBugsOKCode is the HTTP code returned for type ListBugsOK
 const ListBugsOKCode int = 200
 
-/*ListBugsOK return a list of bugs
+/*ListBugsOK returns a list of fishes
 
 swagger:response listBugsOK
 */

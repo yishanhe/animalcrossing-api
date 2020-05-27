@@ -125,6 +125,17 @@ definitions:
         $ref: "#/definitions/Colors"
         x-go-custom-tag: 'bson:"colors"'
 
+  BugListResult:
+    type: object
+    allOf:
+      - $ref: "#/definitions/ListResult"
+      - type: object
+        properties:
+          results:
+            type: array
+            items:
+              $ref: "#/definitions/Bug"
+
   Fish:
     type: object
     properties:
@@ -242,5 +253,37 @@ paths:
           description: return a fish
           schema:
             $ref: "#/definitions/Fish"
+        404:
+          description: not found
+  /catalog/bugs:
+    get:
+      tags:
+        - bug
+      operationId: listBugs
+      parameters:
+        - $ref: "#/parameters/Cursor"
+        - $ref: "#/parameters/PageSize"
+        - $ref: "#/parameters/SortBy"
+      responses:
+        200:
+          description: returns a list of fishes
+          schema:
+            $ref: "#/definitions/BugListResult"
+  /catalog/bugs/{id}:
+    get:
+      tags:
+        - bug
+      operationId: getBug
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Numeric ID of the bug to get.
+      responses:
+        200:
+          description: return a bug
+          schema:
+            $ref: "#/definitions/Bug"
         404:
           description: not found

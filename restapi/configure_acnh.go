@@ -41,17 +41,19 @@ func configureAPI(api *operations.AcnhAPI) http.Handler {
 			return middleware.NotImplemented("operation bug.GetBug has not yet been implemented")
 		})
 	}
-	api.FishGetFishHandler = fish.GetFishHandlerFunc(func(params fish.GetFishParams) middleware.Responder {
-		return handlers.NewGetFishById().Handle(params)
-	})
-
+	if api.FishGetFishHandler == nil {
+		api.FishGetFishHandler = fish.GetFishHandlerFunc(func(params fish.GetFishParams) middleware.Responder {
+			return middleware.NotImplemented("operation fish.GetFish has not yet been implemented")
+		})
+	}
 	api.BugListBugsHandler = bug.ListBugsHandlerFunc(func(params bug.ListBugsParams) middleware.Responder {
 		return handlers.NewListBugs().Handle(params)
 	})
-
-	api.FishListFishesHandler = fish.ListFishesHandlerFunc(func(params fish.ListFishesParams) middleware.Responder {
-		return handlers.NewListFishes().Handle(params)
-	})
+	if api.FishListFishesHandler == nil {
+		api.FishListFishesHandler = fish.ListFishesHandlerFunc(func(params fish.ListFishesParams) middleware.Responder {
+			return middleware.NotImplemented("operation fish.ListFishes has not yet been implemented")
+		})
+	}
 
 	api.PreServerShutdown = func() {}
 

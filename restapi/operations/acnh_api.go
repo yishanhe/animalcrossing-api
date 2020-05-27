@@ -19,6 +19,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
+	"github.com/yishanhe/animalcrossing-api/restapi/operations/bug"
 	"github.com/yishanhe/animalcrossing-api/restapi/operations/fish"
 )
 
@@ -43,8 +44,14 @@ func NewAcnhAPI(spec *loads.Document) *AcnhAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		BugGetBugHandler: bug.GetBugHandlerFunc(func(params bug.GetBugParams) middleware.Responder {
+			return middleware.NotImplemented("operation bug.GetBug has not yet been implemented")
+		}),
 		FishGetFishHandler: fish.GetFishHandlerFunc(func(params fish.GetFishParams) middleware.Responder {
 			return middleware.NotImplemented("operation fish.GetFish has not yet been implemented")
+		}),
+		BugListBugsHandler: bug.ListBugsHandlerFunc(func(params bug.ListBugsParams) middleware.Responder {
+			return middleware.NotImplemented("operation bug.ListBugs has not yet been implemented")
 		}),
 		FishListFishesHandler: fish.ListFishesHandlerFunc(func(params fish.ListFishesParams) middleware.Responder {
 			return middleware.NotImplemented("operation fish.ListFishes has not yet been implemented")
@@ -82,8 +89,12 @@ type AcnhAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// BugGetBugHandler sets the operation handler for the get bug operation
+	BugGetBugHandler bug.GetBugHandler
 	// FishGetFishHandler sets the operation handler for the get fish operation
 	FishGetFishHandler fish.GetFishHandler
+	// BugListBugsHandler sets the operation handler for the list bugs operation
+	BugListBugsHandler bug.ListBugsHandler
 	// FishListFishesHandler sets the operation handler for the list fishes operation
 	FishListFishesHandler fish.ListFishesHandler
 	// ServeError is called when an error is received, there is a default handler
@@ -152,8 +163,14 @@ func (o *AcnhAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.BugGetBugHandler == nil {
+		unregistered = append(unregistered, "bug.GetBugHandler")
+	}
 	if o.FishGetFishHandler == nil {
 		unregistered = append(unregistered, "fish.GetFishHandler")
+	}
+	if o.BugListBugsHandler == nil {
+		unregistered = append(unregistered, "bug.ListBugsHandler")
 	}
 	if o.FishListFishesHandler == nil {
 		unregistered = append(unregistered, "fish.ListFishesHandler")
@@ -249,7 +266,15 @@ func (o *AcnhAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/catalog/bugs/{id}"] = bug.NewGetBug(o.context, o.BugGetBugHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/catalog/fishes/{id}"] = fish.NewGetFish(o.context, o.FishGetFishHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/catalog/bugs"] = bug.NewListBugs(o.context, o.BugListBugsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
